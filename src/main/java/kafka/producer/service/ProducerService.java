@@ -35,4 +35,16 @@ public class ProducerService {
             e.printStackTrace();
         }
     }
+
+    public void asyncSendMessage(String topic, String message) {
+        try (KafkaProducer<String, String> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
+            ProducerRecord<String, String> producerRecord =
+                    new ProducerRecord<>(topic, "key", message);
+            producer.send(producerRecord, new ProducerCallbackService());
+            System.out.println("Send message");
+            producer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

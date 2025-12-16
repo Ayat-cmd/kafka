@@ -16,6 +16,6 @@ public class Main {
         kafkaProducerConfig.setProperty("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
         ProducerService producerService = new ProducerService(kafkaProducerConfig);
-        producerService.syncSendMessage("my-topic", "My first sync message");
+        producerService.asyncSendMessage("my-topic", "My first async message");
     }
 }
