@@ -1,5 +1,7 @@
 package kafka.producer;
 
+import kafka.producer.config.KafkaProducerConfig;
+import kafka.producer.service.ProducerService;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -7,21 +9,13 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-        Properties kafkaProps = new Properties();
+        KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();
 
-        kafkaProps.put("bootstrap.servers", "localhost:9092");
-        kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        kafkaProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProducerConfig.setProperty("bootstrap.servers", "localhost:9092");
+        kafkaProducerConfig.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProducerConfig.setProperty("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
-
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(kafkaProps)){
-            ProducerRecord<String, String> producerRecord =
-                    new ProducerRecord<>("my-topic", "key", "Hello World");
-            producer.send(producerRecord);
-            producer.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        ProducerService producerService = new ProducerService(kafkaProducerConfig);
+        producerService.syncSendMessage("my-topic", "My first sync message");
     }
 }
