@@ -5,7 +5,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
-public class ProducerService {
+public class ProducerService<K, V> {
 
     private final KafkaProducerConfig kafkaProducerConfig;
 
@@ -13,10 +13,10 @@ public class ProducerService {
         this.kafkaProducerConfig = kafkaProducerConfig;
     }
 
-    public void sendMessage(String topic, String message) {
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
-            ProducerRecord<String, String> producerRecord =
-                    new ProducerRecord<>(topic, "key", message);
+    public void sendMessage(String topic, K key, V message) {
+        try (KafkaProducer<K, V> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
+            ProducerRecord<K, V> producerRecord =
+                    new ProducerRecord<>(topic, key, message);
             producer.send(producerRecord);
             producer.flush();
         } catch (Exception e) {
@@ -24,10 +24,10 @@ public class ProducerService {
         }
     }
 
-    public void syncSendMessage(String topic, String message) {
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
-            ProducerRecord<String, String> producerRecord =
-                    new ProducerRecord<>(topic, "key", message);
+    public void syncSendMessage(String topic, K key, V message) {
+        try (KafkaProducer<K, V> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
+            ProducerRecord<K, V> producerRecord =
+                    new ProducerRecord<>(topic, key, message);
             RecordMetadata result = producer.send(producerRecord).get();
             producer.flush();
             System.out.println("Send message: " + message + ", partition: " + result.partition() + ", offset: " + result.offset());
@@ -36,10 +36,10 @@ public class ProducerService {
         }
     }
 
-    public void asyncSendMessage(String topic, String message) {
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
-            ProducerRecord<String, String> producerRecord =
-                    new ProducerRecord<>(topic, "key", message);
+    public void asyncSendMessage(String topic, K key, V message) {
+        try (KafkaProducer<K, V> producer = new KafkaProducer<>(kafkaProducerConfig.build())){
+            ProducerRecord<K, V> producerRecord =
+                    new ProducerRecord<>(topic, key, message);
             producer.send(producerRecord, new ProducerCallbackService());
             System.out.println("Send message");
             producer.flush();
