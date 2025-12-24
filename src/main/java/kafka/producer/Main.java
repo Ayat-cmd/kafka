@@ -13,7 +13,7 @@ public class Main {
 
         Customer customer = new Customer("Ayat", 1);
 
-        sendJsonCustomerMessage("SPRING-DEMO", customer);
+        sendJsonCustomerMessageWithCustomPartitioner("demo-partitioner", customer);
     }
 
     private static void sendStringMessage(String topic, String message) {
@@ -47,5 +47,18 @@ public class Main {
 
         ProducerService<String, Customer> producerService = new ProducerService<>(kafkaProducerConfig);
         producerService.asyncSendMessage(topic, "cutomer key", customer);
+    }
+
+    private static void sendJsonCustomerMessageWithCustomPartitioner(String topic, Customer customer) {
+        KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();
+
+        kafkaProducerConfig.setProperty("bootstrap.servers", "localhost:9092");
+        kafkaProducerConfig.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProducerConfig.setProperty("value.serializer", "kafka.producer.utils.CustomerJsonSerializer");
+        kafkaProducerConfig.setProperty("partitioner.class", "kafka.producer.utils.BananaPartitioner");
+
+        ProducerService<String, Customer> producerService = new ProducerService<>(kafkaProducerConfig);
+        producerService.asyncSendMessage(topic, "Banana", customer);
+        producerService.asyncSendMessage(topic, "key", customer);
     }
 }
