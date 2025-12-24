@@ -9,8 +9,9 @@ public class KafkaConsumerConfig {
         this.properties = new Properties();
     }
 
-    public void setProperties(String key, String value) {
+    public KafkaConsumerConfig setProperties(String key, String value) {
         this.properties.put(key, value);
+        return this;
     }
 
     public Properties build() {

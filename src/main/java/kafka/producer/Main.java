@@ -14,6 +14,7 @@ public class Main {
         Customer customer = new Customer("Ayat", 1);
 
         sendJsonCustomerMessageWithCustomPartitioner("demo-partitioner", customer);
+        sendStringMessage("SPRING-DEMO", "test");
     }
 
     private static void sendStringMessage(String topic, String message) {
