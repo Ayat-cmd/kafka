@@ -13,7 +13,7 @@ public class Main {
 
         Customer customer = new Customer("Ayat", 1);
 
-        sendCustomerMessage("SPRING-DEMO", customer);
+        sendJsonCustomerMessage("SPRING-DEMO", customer);
     }
 
     private static void sendStringMessage(String topic, String message) {
@@ -33,6 +33,17 @@ public class Main {
         kafkaProducerConfig.setProperty("bootstrap.servers", "localhost:9092");
         kafkaProducerConfig.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         kafkaProducerConfig.setProperty("value.serializer", "kafka.producer.utils.CustomerSerializer");
+
+        ProducerService<String, Customer> producerService = new ProducerService<>(kafkaProducerConfig);
+        producerService.asyncSendMessage(topic, "cutomer key", customer);
+    }
+
+    private static void sendJsonCustomerMessage(String topic, Customer customer) {
+        KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();
+
+        kafkaProducerConfig.setProperty("bootstrap.servers", "localhost:9092");
+        kafkaProducerConfig.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProducerConfig.setProperty("value.serializer", "kafka.producer.utils.CustomerJsonSerializer");
 
         ProducerService<String, Customer> producerService = new ProducerService<>(kafkaProducerConfig);
         producerService.asyncSendMessage(topic, "cutomer key", customer);
