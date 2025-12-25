@@ -6,7 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 
 public class ConsumerService<K, V> {
     private final KafkaConsumerConfig consumerConfig;
@@ -15,8 +15,9 @@ public class ConsumerService<K, V> {
         this.consumerConfig = consumerConfig;
     }
 
-    public void getMessages(List<String> topics) {
-        try (KafkaConsumer<K, V> kafkaConsumer = new KafkaConsumer<>(this.consumerConfig.build())) {
+    public void getMessages(Collection<String> topics) {
+        KafkaConsumer<K, V> kafkaConsumer = new KafkaConsumer<>(this.consumerConfig.build());
+        try {
             //kafkaConsumer.subscribe(Arrays.asList("demo-partitioner", "SPRING-DEMO"));
 //            kafkaConsumer.subscribe(Collections.singleton("demo-partitioner"));
             kafkaConsumer.subscribe(topics);
@@ -27,6 +28,8 @@ public class ConsumerService<K, V> {
                             " Offset: " + message.offset() + " Key: " + message.key() + " Value: " + message.value());
                 }
             }
+        } finally {
+            kafkaConsumer.close();
         }
     }
 }
