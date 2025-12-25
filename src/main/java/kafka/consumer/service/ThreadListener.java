@@ -36,6 +36,12 @@ public class ThreadListener extends Thread {
                 for(ConsumerRecord<String, String> message : consumerRecords) {
                     System.out.println("Thread: " + Thread.currentThread().getName() + " Key: " + message.key() + " Value: " + message.value());
                 }
+
+                try {
+                    consumer.commitAsync();
+                } catch (Exception e) {
+                    System.out.println("Thread: " + Thread.currentThread().getName() + " CommitAsync Exception: " + e.getMessage());
+                }
             }
         } finally {
             consumer.close();

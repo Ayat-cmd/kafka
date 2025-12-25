@@ -14,6 +14,7 @@ public class ConsumerApp {
         consumerConfig.setProperties("group.id", "group-1");
         consumerConfig.setProperties("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         consumerConfig.setProperties("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        consumerConfig.setProperties("enable.auto.commit", "false");
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         executorService.submit(new ThreadListener(consumerConfig.build(), Collections.singleton("demo-partitioner1")));
@@ -25,6 +26,7 @@ public class ConsumerApp {
         consumerConfig2.setProperties("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         consumerConfig2.setProperties("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         consumerConfig2.setProperties("auto.offset.reset", "earliest");
+        consumerConfig2.setProperties("enable.auto.commit", "false");
 
         executorService.submit(new ThreadListener(consumerConfig2.build(),  Collections.singleton("demo-partitioner")));
     }
