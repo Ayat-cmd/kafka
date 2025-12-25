@@ -2,6 +2,7 @@ package kafka.consumer.service;
 
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -28,14 +29,18 @@ public class ThreadListener extends Thread {
         this.listen();
     }
 
+    public Map<TopicPartition, OffsetAndMetadata> getOffsets() {
+        return offsets;
+    }
+
     private void listen() {
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(this.properties);
-        consumer.subscribe(this.topics);
 
         try {
-            while (true) {
+            consumer.subscribe(this.topics, new ConsumerRebalanceListenerService(consumer, this::getOffsets));
 
+            while (true) {
                 ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(100));
 
                 for(ConsumerRecord<String, String> message : consumerRecords) {
@@ -50,11 +55,19 @@ public class ThreadListener extends Thread {
                     }
                 }
 
-                consumer.commitAsync(new OffsetCommitCallbackService());
             }
+        } catch (WakeupException e) {
+            // ignore for shutdown
+        } catch (Exception e) {
+            System.out.println("Unexpected error");
+            e.printStackTrace();
         } finally {
-            consumer.close();
-            System.out.println("Thread: " + Thread.currentThread().getName() + " Close");
+            try {
+                consumer.commitSync();
+            } finally {
+                consumer.close();
+                System.out.println("Thread: " + Thread.currentThread().getName() + " Close");
+            }
         }
     }
 }
