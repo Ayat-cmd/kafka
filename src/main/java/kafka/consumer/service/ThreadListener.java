@@ -38,7 +38,7 @@ public class ThreadListener extends Thread {
                 }
 
                 try {
-                    consumer.commitAsync();
+                    consumer.commitSync();
                 } catch (Exception e) {
                     System.out.println("Thread: " + Thread.currentThread().getName() + " CommitAsync Exception: " + e.getMessage());
                 }
