@@ -11,9 +11,10 @@ import java.util.Properties;
 public class Main {
     public static void main(String[] args) {
 
-        Customer customer = new Customer("Ayat", 1);
+        Customer customer = new Customer("Ayat", 3);
 
-        sendJsonCustomerMessageWithCustomPartitioner("demo-partitioner1", customer);
+//        sendCustomerMessage("customer-topic", customer);
+        sendJsonCustomerMessage("customer-json-topic", customer);
 //        sendStringMessage("SPRING-DEMO", "test");
     }
 

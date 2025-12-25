@@ -9,13 +9,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class ConsumerRebalanceListenerService implements ConsumerRebalanceListener {
+public class ConsumerRebalanceListenerService<K, V> implements ConsumerRebalanceListener {
 
-    private KafkaConsumer<String, String> consumer;
+    private final KafkaConsumer<K, V> consumer;
     private Supplier<Map<TopicPartition, OffsetAndMetadata>> offsetSupplier;
 
     public ConsumerRebalanceListenerService(
-            KafkaConsumer<String, String> consumer,
+            KafkaConsumer<K, V> consumer,
             Supplier<Map<TopicPartition, OffsetAndMetadata>> offsetSupplier
     ) {
         this.consumer = consumer;

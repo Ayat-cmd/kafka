@@ -10,17 +10,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class ThreadListener extends Thread {
+public class ThreadListener<K, V> extends Thread {
 
     private final Properties properties;
     private Collection<String> topics;
-    private Map<TopicPartition, OffsetAndMetadata> offsets;
+    private Map<TopicPartition, OffsetAndMetadata> currentOffsets;
     private int countMessages;
 
     public ThreadListener(Properties properties, Collection<String> topics) {
         this.properties = properties;
         this.topics = topics;
-        this.offsets = new HashMap<>();
+        this.currentOffsets = new HashMap<>();
         this.countMessages = 0;
     }
 
@@ -30,28 +30,28 @@ public class ThreadListener extends Thread {
     }
 
     public Map<TopicPartition, OffsetAndMetadata> getOffsets() {
-        return offsets;
+        return currentOffsets;
     }
 
     private void listen() {
 
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(this.properties);
+        KafkaConsumer<K, V> consumer = new KafkaConsumer<>(this.properties);
 
         try {
-            consumer.subscribe(this.topics, new ConsumerRebalanceListenerService(consumer, this::getOffsets));
+            consumer.subscribe(this.topics, new ConsumerRebalanceListenerService<>(consumer, this::getOffsets));
 
             while (true) {
-                ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(100));
+                ConsumerRecords<K, V> consumerRecords = consumer.poll(Duration.ofMillis(100));
 
-                for(ConsumerRecord<String, String> message : consumerRecords) {
+                for(ConsumerRecord<K, V> message : consumerRecords) {
                     System.out.println("Thread: " + Thread.currentThread().getName() + " Key: " + message.key() + " Value: " + message.value());
-                    this.offsets.put(
+                    this.currentOffsets.put(
                             new TopicPartition(message.topic(), message.partition()),
                             new OffsetAndMetadata(message.offset())
                     );
                     this.countMessages++;
                     if (this.countMessages % 10 == 0) {
-                        consumer.commitAsync(this.offsets, new OffsetCommitCallbackService());
+                        consumer.commitAsync(this.currentOffsets, new OffsetCommitCallbackService());
                     }
                 }
 
